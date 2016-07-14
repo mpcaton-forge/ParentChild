@@ -86,6 +86,7 @@ namespace ParentChild.WebUI.Controllers
             SalesOrderViewModel salesOrderViewModel = ViewModels.Helpers.CreateSalesOrderViewModelFromSalesOrder(salesOrder);
 
             salesOrderViewModel.MessageToClient = "You are about to permanently delete this sales order.";
+            salesOrderViewModel.ObjectState = ObjectState.Deleted;
 
             return View(salesOrderViewModel);
         }
@@ -95,6 +96,33 @@ namespace ParentChild.WebUI.Controllers
             SalesOrder salesOrder = ViewModels.Helpers.CreateSalesOrderFromSalesOrderViewModel(salesOrderViewModel);
 
             _salesContext.SalesOrders.Attach(salesOrder);
+
+            if (salesOrder.ObjectState == ObjectState.Deleted)
+            {
+                foreach (SalesOrderItemViewModel salesOrderItemViewModel in salesOrderViewModel.SalesOrderItems)
+                {
+                    SalesOrderItem salesOrderItem = _salesContext.SalesOrderItems.Find(salesOrderItemViewModel.SalesOrderItemId);
+                    if (salesOrderItem != null)
+                    {
+                        salesOrderItem.ObjectState = ObjectState.Deleted;
+                    }
+                }
+            }
+            else
+            {
+                foreach (int salesOrderItemId in salesOrderViewModel.SalesOrderItemsToDelete)
+                {
+                    SalesOrderItem salesOrderItem = _salesContext.SalesOrderItems.Find(salesOrderItemId);
+                    if (salesOrderItem != null)
+                    {
+                        salesOrderItem.ObjectState = ObjectState.Deleted;
+                    }
+                }
+            }
+            
+
+            
+
             _salesContext.ApplyStateChanges();
             _salesContext.SaveChanges();
 

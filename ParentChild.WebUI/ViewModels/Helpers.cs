@@ -61,7 +61,7 @@ namespace ParentChild.WebUI.ViewModels
                     temporarySalesOrderItemId--;
                 }
 
-                salesOrderItem.SalesOrderId = salesOrderItemViewModel.SalesOrderId;
+                salesOrderItem.SalesOrderId = salesOrderViewModel.SalesOrderId;
 
                 salesOrder.SalesOrderItems.Add(salesOrderItem);
             }
